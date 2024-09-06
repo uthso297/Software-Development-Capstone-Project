@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": ".",
-      "program": "build/Debug/outDebug",
+      "cwd": "p:/Software Development Capstone Project/Capstone Project Daily Tasks",
+      "program": "p:/Software Development Capstone Project/Capstone Project Daily Tasks/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
