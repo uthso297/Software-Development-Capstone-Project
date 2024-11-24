@@ -281,6 +281,47 @@ void generateSalesReport()
     }
 }
 
+// Function to delete a book from inventory
+void deleteBook()
+{
+    int id;
+    printf("Enter Book ID to delete: ");
+    scanf("%d", &id);
+
+    int found = 0;
+
+    // Search for the book with the given ID
+    for (int i = 0; i < bookCount; i++)
+    {
+        if (books[i].id == id)
+        {
+            found = 1;
+
+            // Shift to fill the gap
+            for (int j = i; j < bookCount - 1; j++)
+            {
+                books[j] = books[j + 1];
+            }
+
+            // Decrease book count
+            bookCount--;
+
+            printf("Book with ID %d deleted successfully!\n", id);
+
+            // Update book list
+            saveBooks();
+            saveBuy();
+
+            return;
+        }
+    }
+
+    if (!found)
+    {
+        printf("Book with ID %d not found!\n", id);
+    }
+}
+
 // Here is our main function
 int main()
 {
@@ -332,7 +373,7 @@ int main()
                         sellBook();
                         break;
                     case 5:
-                        printf("Deleting book....");
+                        deleteBook();
                         break;
                     case 6:
                         generateBuyReport();
