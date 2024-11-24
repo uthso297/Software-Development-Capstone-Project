@@ -322,6 +322,35 @@ void deleteBook()
     }
 }
 
+// Function to search book by title (strstr is for advance search but if we needed exact title then strcmp could be used)
+void searchBook()
+{
+    char searchTitle[50];
+    int found = 0;
+
+    printf("Enter Book Title to search: ");
+    getchar(); 
+    fgets(searchTitle, sizeof(searchTitle), stdin);
+    searchTitle[strcspn(searchTitle, "\n")] = '\0'; 
+
+    for (int i = 0; i < bookCount; i++)
+    {
+        if (strstr(books[i].title, searchTitle) != NULL)
+        {
+            printf("\nBook Found: \n");
+            printf("ID: %d, Title: %s, Author: %s, Price: %.2f, Quantity: %d\n",
+                   books[i].id, books[i].title, books[i].author,
+                   books[i].price, books[i].quantity);
+            found = 1;
+        }
+    }
+
+    if (!found)
+    {
+        printf("No book found with the title '%s'\n", searchTitle);
+    }
+}
+
 // Here is our main function
 int main()
 {
@@ -367,7 +396,7 @@ int main()
                         addBook();
                         break;
                     case 3:
-                        printf("Searching book....");
+                        searchBook();
                         break;
                     case 4:
                         sellBook();
