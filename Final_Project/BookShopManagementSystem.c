@@ -15,6 +15,7 @@ typedef struct
     char title[50];
     char author[50];
     float price;
+    float sellPrice;
     int quantity;
     float totalPrice;
 } Book;
@@ -168,15 +169,22 @@ void addBook()
         Book newBook;
         printf("Enter Book ID: ");
         scanf("%d", &newBook.id);
+
         printf("Enter Book Title: ");
         getchar();
         fgets(newBook.title, sizeof(newBook.title), stdin);
         newBook.title[strcspn(newBook.title, "\n")] = '\0';
+
         printf("Enter Author Name: ");
         fgets(newBook.author, sizeof(newBook.author), stdin);
         newBook.author[strcspn(newBook.author, "\n")] = '\0';
+
         printf("Enter Book Price: ");
         scanf("%f", &newBook.price);
+
+        printf("Enter Book Sell Price: ");
+        scanf("%f", &newBook.sellPrice);
+
         printf("Enter Quantity: ");
         scanf("%d", &newBook.quantity);
 
@@ -184,7 +192,7 @@ void addBook()
 
         books[bookCount++] = newBook;
 
-        // Track the buy report
+        // Track buy report
         BuyReport newBuyReport;
         newBuyReport.bookId = newBook.id;
         strcpy(newBuyReport.bookTitle, newBook.title);
@@ -273,11 +281,24 @@ void sellBook()
 // Sales report function
 void generateSalesReport()
 {
+
     printf("\nSales Report:\n");
     for (int i = 0; i < salesCount; i++)
     {
-        printf("Book Id: %d Book Title: %s Quantity: %d Total Price: %.2f taka\n", sales[i].bookId, sales[i].bookTitle,
-               sales[i].quantitySold, sales[i].totalPrice);
+        float sellPrice = 0.0;
+        for (int j = 0; j < bookCount; j++)
+        {
+            if (books[j].id == sales[i].bookId)
+            {
+                sellPrice = books[j].sellPrice;
+                break;
+            }
+        }
+
+        float profit = (sellPrice * sales[i].quantitySold) - (books[i].price * sales[i].quantitySold);
+
+        printf("Book Id: %d Book Title: %s Quantity: %d Total Price: %.2f taka Profit: %.2f taka\n",
+               sales[i].bookId, sales[i].bookTitle, sales[i].quantitySold, sales[i].totalPrice, profit);
     }
 }
 
@@ -329,9 +350,9 @@ void searchBook()
     int found = 0;
 
     printf("Enter Book Title to search: ");
-    getchar(); 
+    getchar();
     fgets(searchTitle, sizeof(searchTitle), stdin);
-    searchTitle[strcspn(searchTitle, "\n")] = '\0'; 
+    searchTitle[strcspn(searchTitle, "\n")] = '\0';
 
     for (int i = 0; i < bookCount; i++)
     {
