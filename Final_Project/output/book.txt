@@ -1,1 +1,1 @@
-Book Id: 1 Title: We Author: We Price: 70.00 Quantity: 3 Total price: 350.00
+Book Id: 1 Title: Opekkha Author: HM Price: 50.00 Quantity: 3 Total price: 150.00

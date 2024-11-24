@@ -4,10 +4,8 @@
 // User Details
 typedef struct
 {
-
     char userName[30];
     char userPassword[20];
-
 } User;
 
 // Book details
@@ -30,12 +28,23 @@ typedef struct
     float totalPrice;
 } Sale;
 
+// Buy Report structure
+typedef struct
+{
+    int bookId;
+    char bookTitle[50];
+    int quantityBought;
+    float totalPrice;
+} BuyReport;
+
 User users[3];
 int userCount = 0;
 Book books[20];
 Sale sales[20];
+BuyReport buyReports[20];
 int bookCount = 0;
 int salesCount = 0;
+int buyReportCount = 0;
 
 // Function to save user with file handling
 void saveUser()
@@ -111,13 +120,28 @@ int loginUser()
 // View Books function
 void viewInventory()
 {
-
     printf("\nBook Inventory:\n");
     for (int i = 0; i < bookCount; i++)
     {
         printf("ID: %d, Title: %s, Author: %s, Price: %.2f, Quantity: %d\n",
                books[i].id, books[i].title, books[i].author,
                books[i].price, books[i].quantity);
+    }
+}
+
+// Save buy report function
+void saveBuy()
+{
+    FILE *fptr = fopen("buyreport.txt", "w");
+    if (fptr)
+    {
+        for (int i = 0; i < buyReportCount; i++)
+        {
+            fprintf(fptr, "Book ID: %d Title: %s Quantity: %d Total Price: %.2f\n",
+                    buyReports[i].bookId, buyReports[i].bookTitle,
+                    buyReports[i].quantityBought, buyReports[i].totalPrice);
+        }
+        fclose(fptr);
     }
 }
 
@@ -159,12 +183,35 @@ void addBook()
         newBook.totalPrice = newBook.price * newBook.quantity;
 
         books[bookCount++] = newBook;
+
+        // Track the buy report
+        BuyReport newBuyReport;
+        newBuyReport.bookId = newBook.id;
+        strcpy(newBuyReport.bookTitle, newBook.title);
+        newBuyReport.quantityBought = newBook.quantity;
+        newBuyReport.totalPrice = newBook.totalPrice;
+
+        buyReports[buyReportCount++] = newBuyReport;
+
         printf("Book added successfully!\n");
         saveBooks();
+        saveBuy();
     }
     else
     {
         printf("Inventory is full!\n");
+    }
+}
+
+// Function to generate Buy Report
+void generateBuyReport()
+{
+    printf("\nBuy Report:\n");
+    for (int i = 0; i < buyReportCount; i++)
+    {
+        printf("Book ID: %d, Title: %s, Quantity Bought: %d, Total Price: %.2f\n",
+               buyReports[i].bookId, buyReports[i].bookTitle,
+               buyReports[i].quantityBought, buyReports[i].totalPrice);
     }
 }
 
@@ -184,7 +231,6 @@ void saveSales()
 }
 
 // Track Sale function
-
 void trackSale(int id, char *title, int quantity, float totalPrice)
 {
     Sale newSale = {id, "", quantity, totalPrice};
@@ -209,6 +255,7 @@ void sellBook()
             {
                 books[i].quantity -= quantity;
                 float totalPrice = books[i].price * quantity;
+                books[i].totalPrice -= totalPrice;
                 printf("Sold %d copies of '%s' for a total of %.2f\n", quantity, books[i].title, totalPrice);
                 trackSale(id, books[i].title, quantity, totalPrice);
                 saveBooks();
@@ -229,7 +276,7 @@ void generateSalesReport()
     printf("\nSales Report:\n");
     for (int i = 0; i < salesCount; i++)
     {
-        printf("Book Id: %d Book Title: %s Quantity: %d Total Price: $%.2f taka\n", sales[i].bookId, sales[i].bookTitle,
+        printf("Book Id: %d Book Title: %s Quantity: %d Total Price: %.2f taka\n", sales[i].bookId, sales[i].bookTitle,
                sales[i].quantitySold, sales[i].totalPrice);
     }
 }
@@ -237,28 +284,22 @@ void generateSalesReport()
 // Here is our main function
 int main()
 {
-
     int choice;
 
     do
     {
-
         printf("Enter your choice: \n");
         printf("1/Register\n");
         printf("2/Login\n");
         printf("3/Exit\n");
         scanf("%d", &choice);
         switch (choice)
-
         {
-
         case 1:
-            // printf("This is registration\n");
             registerUser();
             break;
 
         case 2:
-            // printf("This is login\n");
             if (loginUser())
             {
                 printf("Congrats!You are in login page");
@@ -283,22 +324,18 @@ int main()
                         break;
                     case 2:
                         addBook();
-                        // printf("Adding book....");
                         break;
                     case 3:
-
                         printf("Searching book....");
                         break;
                     case 4:
                         sellBook();
-                        // printf("Selling book....");
                         break;
                     case 5:
-                        // deleteBook();
                         printf("Deleting book....");
                         break;
                     case 6:
-                        printf("Generate buy report...");
+                        generateBuyReport();
                         break;
                     case 7:
                         generateSalesReport();
@@ -307,20 +344,20 @@ int main()
                         printf("Logging out...\n");
                         break;
                     default:
-                        printf("Invalid choice! Please try again.");
+                        printf("Invalid choice, try again!\n");
+                        break;
                     }
                 } while (choice != 8);
             }
             break;
 
         case 3:
-            printf("Existing....\n");
+            printf("Exiting...\n");
             break;
-
         default:
-            printf("Invalid Choice! Please try again\n");
+            printf("Invalid choice, try again!\n");
+            break;
         }
-
     } while (choice != 3);
 
     return 0;
