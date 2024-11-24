@@ -10,8 +10,32 @@ typedef struct
 
 } User;
 
+// Book details
+typedef struct
+{
+    int id;
+    char title[50];
+    char author[50];
+    float price;
+    int quantity;
+    float totalPrice;
+} Book;
+
+// Sales info
+typedef struct
+{
+    int bookId;
+    char bookTitle[50];
+    int quantitySold;
+    float totalPrice;
+} Sale;
+
 User users[3];
 int userCount = 0;
+Book books[20];
+Sale sales[20];
+int bookCount = 0;
+int salesCount = 0;
 
 // Function to save user with file handling
 void saveUser()
@@ -22,7 +46,7 @@ void saveUser()
     {
         for (int i = 0; i < userCount; i++)
         {
-            fprintf(fptr, "%s %s\n", users[i].userName, users[i].userPassword);
+            fprintf(fptr, "Name: %s Password: %s\n", users[i].userName, users[i].userPassword);
         }
         fclose(fptr);
     }
@@ -84,6 +108,120 @@ int loginUser()
     return 0;
 }
 
+// View Books function
+void viewInventory()
+{
+
+    printf("\nBook Inventory:\n");
+    for (int i = 0; i < bookCount; i++)
+    {
+        printf("ID: %d, Title: %s, Author: %s, Price: %.2f, Quantity: %d\n",
+               books[i].id, books[i].title, books[i].author,
+               books[i].price, books[i].quantity);
+    }
+}
+
+// Save book function
+void saveBooks()
+{
+    FILE *fptr = fopen("book.txt", "w");
+    if (fptr)
+    {
+        for (int i = 0; i < bookCount; i++)
+        {
+            fprintf(fptr, "Book Id: %d Title: %s Author: %s Price: %.2f Quantity: %d Total price: %0.2f\n", books[i].id, books[i].title,
+                    books[i].author, books[i].price, books[i].quantity, books[i].totalPrice);
+        }
+        fclose(fptr);
+    }
+}
+
+// Add Book function
+void addBook()
+{
+    if (bookCount < 20)
+    {
+        Book newBook;
+        printf("Enter Book ID: ");
+        scanf("%d", &newBook.id);
+        printf("Enter Book Title: ");
+        getchar();
+        fgets(newBook.title, sizeof(newBook.title), stdin);
+        newBook.title[strcspn(newBook.title, "\n")] = '\0';
+        printf("Enter Author Name: ");
+        fgets(newBook.author, sizeof(newBook.author), stdin);
+        newBook.author[strcspn(newBook.author, "\n")] = '\0';
+        printf("Enter Book Price: ");
+        scanf("%f", &newBook.price);
+        printf("Enter Quantity: ");
+        scanf("%d", &newBook.quantity);
+
+        newBook.totalPrice = newBook.price * newBook.quantity;
+
+        books[bookCount++] = newBook;
+        printf("Book added successfully!\n");
+        saveBooks();
+    }
+    else
+    {
+        printf("Inventory is full!\n");
+    }
+}
+
+// Save sales function
+void saveSales()
+{
+    FILE *fptr = fopen("sales.txt", "w");
+    if (fptr)
+    {
+        for (int i = 0; i < salesCount; i++)
+        {
+            fprintf(fptr, "BookID: %d Title: %s Quantity: %d Total Price: %.2f\n", sales[i].bookId, sales[i].bookTitle,
+                    sales[i].quantitySold, sales[i].totalPrice);
+        }
+        fclose(fptr);
+    }
+}
+
+// Track Sale function
+
+void trackSale(int id, char* title, int quantity, float totalPrice)
+{
+    Sale newSale = {id, "", quantity, totalPrice};
+    strcpy(newSale.bookTitle, title);
+    sales[salesCount++] = newSale;
+    saveSales();
+}
+// Sell Book
+void sellBook()
+{
+    int id, quantity;
+    printf("Enter Book ID to sell: ");
+    scanf("%d", &id);
+    printf("Enter Quantity to sell: ");
+    scanf("%d", &quantity);
+    for (int i = 0; i < bookCount; i++)
+    {
+        if (books[i].id == id)
+        {
+            if (books[i].quantity >= quantity)
+            {
+                books[i].quantity -= quantity;
+                float totalPrice = books[i].price * quantity;
+                printf("Sold %d copies of '%s' for a total of %.2f\n", quantity, books[i].title, totalPrice);
+                trackSale(id, books[i].title, quantity, totalPrice);
+                saveBooks();
+            }
+            else
+            {
+                printf("Not enough stock available!\n");
+            }
+            return;
+        }
+    }
+    printf("Book ID not found!\n");
+}
+
 // Here is our main function
 int main()
 {
@@ -120,44 +258,47 @@ int main()
                     printf("3. Search Book\n");
                     printf("4. Sell Book\n");
                     printf("5. Delete Book\n");
-                    printf("6. Generate Sales Report\n");
-                    printf("7. Logout\n");
+                    printf("6. Generate Buy Report\n");
+                    printf("7. Generate Sales Report\n");
+                    printf("8. Logout\n");
                     printf("Enter your choice: ");
                     scanf("%d", &choice);
 
                     switch (choice)
                     {
                     case 1:
-                        // viewInventory();
-                        printf("Displaying book...");
+                        viewInventory();
                         break;
                     case 2:
-                        // addBook();
-                        printf("Adding book....");
+                        addBook();
+                        // printf("Adding book....");
                         break;
                     case 3:
 
                         printf("Searching book....");
                         break;
                     case 4:
-                        // sellBook();
-                        printf("Selling book....");
+                        sellBook();
+                        // printf("Selling book....");
                         break;
                     case 5:
                         // deleteBook();
                         printf("Deleting book....");
                         break;
                     case 6:
+                        printf("Generate buy report...");
+                        break;
+                    case 7:
                         // generateSalesReport();
                         printf("Generating sales report....");
                         break;
-                    case 7:
+                    case 8:
                         printf("Logging out...\n");
                         break;
                     default:
                         printf("Invalid choice! Please try again.");
                     }
-                } while (choice != 7);
+                } while (choice != 8);
             }
             break;
 
