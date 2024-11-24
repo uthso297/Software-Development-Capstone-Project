@@ -112,6 +112,52 @@ int main()
             if (loginUser())
             {
                 printf("Congrats!You are in login page");
+                do
+                {
+                    printf("\nBook Shop Management System\n");
+                    printf("1. View Inventory\n");
+                    printf("2. Add Book\n");
+                    printf("3. Search Book\n");
+                    printf("4. Sell Book\n");
+                    printf("5. Delete Book\n");
+                    printf("6. Generate Sales Report\n");
+                    printf("7. Logout\n");
+                    printf("Enter your choice: ");
+                    scanf("%d", &choice);
+
+                    switch (choice)
+                    {
+                    case 1:
+                        // viewInventory();
+                        printf("Displaying book...");
+                        break;
+                    case 2:
+                        // addBook();
+                        printf("Adding book....");
+                        break;
+                    case 3:
+
+                        printf("Searching book....");
+                        break;
+                    case 4:
+                        // sellBook();
+                        printf("Selling book....");
+                        break;
+                    case 5:
+                        // deleteBook();
+                        printf("Deleting book....");
+                        break;
+                    case 6:
+                        // generateSalesReport();
+                        printf("Generating sales report....");
+                        break;
+                    case 7:
+                        printf("Logging out...\n");
+                        break;
+                    default:
+                        printf("Invalid choice! Please try again.");
+                    }
+                } while (choice != 7);
             }
             break;
 
