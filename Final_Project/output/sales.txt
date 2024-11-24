@@ -1,1 +1,1 @@
-1 we 2 60.00
+BookID: 1 Title: We Quantity: 2 Total Price: 140.00

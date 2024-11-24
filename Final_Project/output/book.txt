@@ -1,1 +1,1 @@
-Book Id: 1 Title: we Author: we Price: 30.00 Quantity: 2 Total price: 120.00
+Book Id: 1 Title: We Author: We Price: 70.00 Quantity: 3 Total price: 350.00

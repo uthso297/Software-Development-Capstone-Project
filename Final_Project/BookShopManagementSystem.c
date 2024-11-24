@@ -185,13 +185,14 @@ void saveSales()
 
 // Track Sale function
 
-void trackSale(int id, char* title, int quantity, float totalPrice)
+void trackSale(int id, char *title, int quantity, float totalPrice)
 {
     Sale newSale = {id, "", quantity, totalPrice};
     strcpy(newSale.bookTitle, title);
     sales[salesCount++] = newSale;
     saveSales();
 }
+
 // Sell Book
 void sellBook()
 {
@@ -220,6 +221,17 @@ void sellBook()
         }
     }
     printf("Book ID not found!\n");
+}
+
+// Sales report function
+void generateSalesReport()
+{
+    printf("\nSales Report:\n");
+    for (int i = 0; i < salesCount; i++)
+    {
+        printf("Book Id: %d Book Title: %s Quantity: %d Total Price: $%.2f taka\n", sales[i].bookId, sales[i].bookTitle,
+               sales[i].quantitySold, sales[i].totalPrice);
+    }
 }
 
 // Here is our main function
@@ -289,8 +301,7 @@ int main()
                         printf("Generate buy report...");
                         break;
                     case 7:
-                        // generateSalesReport();
-                        printf("Generating sales report....");
+                        generateSalesReport();
                         break;
                     case 8:
                         printf("Logging out...\n");
