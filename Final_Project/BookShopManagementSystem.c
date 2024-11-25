@@ -6,6 +6,7 @@ typedef struct
 {
     char userName[30];
     char userPassword[20];
+    char role[10]; // "admin" or "user"
 } User;
 
 // Book details
@@ -56,27 +57,40 @@ void saveUser()
     {
         for (int i = 0; i < userCount; i++)
         {
-            fprintf(fptr, "Name: %s Password: %s\n", users[i].userName, users[i].userPassword);
+            fprintf(fptr, "Name: %s Password: %s Role: %s\n", users[i].userName, users[i].userPassword, users[i].role);
         }
         fclose(fptr);
     }
 }
-
-// Function to register user with file handling
+// Registration
 void registerUser()
 {
     printf("Registering user...\n");
     if (userCount < 3)
     {
         User newUser;
-        getchar();
+        getchar(); // To prevent new line problem
         printf("Enter Username: ");
         fgets(newUser.userName, sizeof(newUser.userName), stdin);
         newUser.userName[strcspn(newUser.userName, "\n")] = '\0';
 
+        // Check if the username already exists
+        for (int i = 0; i < userCount; i++)
+        {
+            if (strcmp(users[i].userName, newUser.userName) == 0)
+            {
+                printf("Username already exists. Please choose a different username.\n");
+                return;
+            }
+        }
+
         printf("Enter Password: ");
         fgets(newUser.userPassword, sizeof(newUser.userPassword), stdin);
         newUser.userPassword[strcspn(newUser.userPassword, "\n")] = '\0';
+
+        printf("Enter Role (admin/user): ");
+        fgets(newUser.role, sizeof(newUser.role), stdin);
+        newUser.role[strcspn(newUser.role, "\n")] = '\0';
 
         printf("User registration successfully completed\n");
         users[userCount++] = newUser;
@@ -110,7 +124,16 @@ int loginUser()
         if (strcmp(users[i].userName, userName) == 0 && strcmp(users[i].userPassword, userPass) == 0)
         {
             printf("Login successfully!\n");
-            return 1;
+            if (strcmp(users[i].role, "admin") == 0)
+            {
+                printf("Logged in as Admin.\n");
+                return 2; // Admin access
+            }
+            else
+            {
+                printf("Logged in as User.\n");
+                return 1; // User access
+            }
         }
     }
 
@@ -264,8 +287,9 @@ void sellBook()
                 books[i].quantity -= quantity;
                 float totalPrice = books[i].price * quantity;
                 books[i].totalPrice -= totalPrice;
-                printf("Sold %d copies of '%s' for a total of %.2f\n", quantity, books[i].title, totalPrice);
-                trackSale(id, books[i].title, quantity, totalPrice);
+                float totalSellPrice = books[i].sellPrice * quantity;
+                printf("Sold %d copies of '%s' for a total of %.2f\n", quantity, books[i].title, totalSellPrice);
+                trackSale(id, books[i].title, quantity, totalSellPrice);
                 saveBooks();
             }
             else
@@ -281,26 +305,31 @@ void sellBook()
 // Sales report function
 void generateSalesReport()
 {
-
     printf("\nSales Report:\n");
+
     for (int i = 0; i < salesCount; i++)
     {
         float sellPrice = 0.0;
+        float costPrice = 0.0;
+
         for (int j = 0; j < bookCount; j++)
         {
             if (books[j].id == sales[i].bookId)
             {
-                sellPrice = books[j].sellPrice;
-                break;
+                sellPrice = books[j].sellPrice; 
+                costPrice = books[j].price;  
+                break; 
             }
         }
 
-        float profit = (sellPrice * sales[i].quantitySold) - (books[i].price * sales[i].quantitySold);
+        float profit = (sellPrice * sales[i].quantitySold) - (costPrice * sales[i].quantitySold);
 
-        printf("Book Id: %d Book Title: %s Quantity: %d Total Price: %.2f taka Profit: %.2f taka\n",
-               sales[i].bookId, sales[i].bookTitle, sales[i].quantitySold, sales[i].totalPrice, profit);
+        printf("Book Id: %d, Title: %s, Quantity: %d, Total Price: %.2f, Profit: %.2f\n",
+               sales[i].bookId, sales[i].bookTitle, sales[i].quantitySold,
+               sales[i].totalPrice, profit);
     }
 }
+
 
 // Function to delete a book from inventory
 void deleteBook()
@@ -373,9 +402,11 @@ void searchBook()
 }
 
 // Here is our main function
+// Here is our main function
 int main()
 {
     int choice;
+    int userType = 0; // 0 = no login, 1 = user, 2 = admin
 
     do
     {
@@ -391,19 +422,22 @@ int main()
             break;
 
         case 2:
-            if (loginUser())
+            userType = loginUser();
+            if (userType)
             {
-                printf("Congrats!You are in login page");
                 do
                 {
                     printf("\nBook Shop Management System\n");
                     printf("1. View Inventory\n");
-                    printf("2. Add Book\n");
-                    printf("3. Search Book\n");
-                    printf("4. Sell Book\n");
-                    printf("5. Delete Book\n");
-                    printf("6. Generate Buy Report\n");
-                    printf("7. Generate Sales Report\n");
+                    if (userType == 2) // Admin has full access
+                    {
+                        printf("2. Add Book\n");
+                        printf("3. Delete Book\n");
+                        printf("4. Generate Buy Report\n");
+                        printf("5. Generate Sales Report\n");
+                    }
+                    printf("6. Search Book\n");
+                    printf("7. Sell Book\n");
                     printf("8. Logout\n");
                     printf("Enter your choice: ");
                     scanf("%d", &choice);
@@ -414,37 +448,51 @@ int main()
                         viewInventory();
                         break;
                     case 2:
-                        addBook();
+                        if (userType == 2) // Admin can add books
+                            addBook();
+                        else
+                            printf("Access denied! Admin privileges required.\n");
                         break;
                     case 3:
-                        searchBook();
+                        if (userType == 2) // Admin can delete books
+                            deleteBook();
+                        else
+                            printf("Access denied! Admin privileges required.\n");
                         break;
                     case 4:
-                        sellBook();
+                        if (userType == 2) // Admin can generate buy report
+                            generateBuyReport();
+                        else
+                            printf("Access denied! Admin privileges required.\n");
                         break;
                     case 5:
-                        deleteBook();
+                        if (userType == 2) // Admin can generate sales report
+                            generateSalesReport();
+                        else
+                            printf("Access denied! Admin privileges required.\n");
                         break;
                     case 6:
-                        generateBuyReport();
+                        searchBook();
                         break;
                     case 7:
-                        generateSalesReport();
+                        sellBook();
                         break;
                     case 8:
                         printf("Logging out...\n");
+                        userType = 0;
                         break;
                     default:
                         printf("Invalid choice, try again!\n");
                         break;
                     }
-                } while (choice != 8);
+                } while (userType != 0);
             }
             break;
 
         case 3:
             printf("Exiting...\n");
             break;
+
         default:
             printf("Invalid choice, try again!\n");
             break;
