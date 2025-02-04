@@ -20,9 +20,9 @@ This C program is a simple bookshop management system that allows users to regis
 
 ## Compilation and Execution
 To compile and run the program, use the following commands:
--First enter into final project file
--Then clone the c file
--Run in your Vs Code or other IDEs
+-**First enter into final project file
+-**Then clone the c file
+-**Run in your Vs Code or other IDEs
 
 ## Example Usage
 ```
