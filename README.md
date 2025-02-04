@@ -19,10 +19,9 @@ This C program is a simple bookshop management system that allows users to regis
 - **File Handling**: Used to store user data, book details, sales, and purchase records.
 
 ## Compilation and Execution
-To compile and run the program, use the following commands:
--**First enter into final project file
--**Then clone the c file
--**Run in your Vs Code or other IDEs
+- **First Step**: Enter into the final poject file
+- **Second Step**: Clone the c file
+- **Third Step**: Run in VsCode or other IDEs
 
 ## Example Usage
 ```
